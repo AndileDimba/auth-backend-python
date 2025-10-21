@@ -1,0 +1,6 @@
+pydantic~=2.12.3
+fastapi~=0.119.1
+python-jose~=3.5.0
+pydantic-settings~=2.11.0
+passlib~=1.7.4
+SQLAlchemy~=2.0.44
