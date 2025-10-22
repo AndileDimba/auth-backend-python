@@ -1,24 +1,30 @@
-import os
+from __future__ import annotations
+import urllib.parse
 from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
-    # Database configuration
-    DATABASE_HOST: str = os.getenv("DATABASE_HOST", "localhost")
-    DATABASE_PORT: int = int(os.getenv("DATABASE_PORT", "3306"))
-    DATABASE_NAME: str = os.getenv("DATABASE_NAME", "mydb")
-    DATABASE_USER: str = os.getenv("DATABASE_USER", "user")
-    DATABASE_PASSWORD: str = os.getenv("DATABASE_PASSWORD", "password")
+    # DB parts (will be read from env or .env)
+    DATABASE_HOST: str
+    DATABASE_PORT: int = 3306
+    DATABASE_NAME: str
+    DATABASE_USER: str
+    DATABASE_PASSWORD: str
 
-    # Security configuration
-    SECRET_KEY: str = os.getenv("SECRET_KEY", "insecure-default-key")
-    ALGORITHM: str = os.getenv("ALGORITHM", "HS256")
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "30"))
+    # Security
+    SECRET_KEY: str
+    ALGORITHM: str = "HS256"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
 
-    # Construct SQLAlchemy connection string
+    model_config = {
+        "env_file": ".env",
+        "env_file_encoding": "utf-8",
+    }
+
     @property
-    def DATABASE_URL(self):
-        return f"mysql+pymysql://{self.DATABASE_USER}:{self.DATABASE_PASSWORD}@{self.DATABASE_HOST}:{self.DATABASE_PORT}/{self.DATABASE_NAME}"
+    def DATABASE_URL(self) -> str:
+        pw = urllib.parse.quote_plus(self.DATABASE_PASSWORD or "")
+        return f"mysql+pymysql://{self.DATABASE_USER}:{pw}@{self.DATABASE_HOST}:{self.DATABASE_PORT}/{self.DATABASE_NAME}"
 
 
 settings = Settings()

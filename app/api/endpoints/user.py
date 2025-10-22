@@ -25,6 +25,9 @@ def update_user(
     user_email: str = Depends(get_current_user),
     user_service: UserService = Depends(get_user_service)
 ):
-    # In real implementation, get user ID from DB using email
-    user = user_service.update_user(1, update_data)  # Replace with actual user ID lookup
+
+    user_db = user_service.get_user_by_email(user_email)
+    if not user_db:
+        raise HTTPException(status_code=404, detail="User not found")
+    user = user_service.update_user(user_db.id, update_data)
     return user

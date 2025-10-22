@@ -1,25 +1,23 @@
 from sqlalchemy.orm import Session
-from app.infrastructure.database import get_db
-from app.domain.entities import UserInDB, UserCreate, UserUpdate
+from app.domain.entities import UserInDB, UserCreate, UserUpdate, UserInDBWithPassword
 from app.infrastructure.models import User
 from app.core.security import get_password_hash
-
 
 class SQLUserRepository:
     def __init__(self, db: Session):
         self.db = db
 
-    def get_by_email(self, email: str) -> UserInDB | None:
+    def get_by_email(self, email: str) -> UserInDBWithPassword | None:
         user = self.db.query(User).filter(User.email == email).first()
-        return UserInDB.from_orm(user) if user else None
+        return UserInDBWithPassword.from_orm(user) if user else None
 
     def create(self, user: UserCreate) -> UserInDB:
         hashed_password = get_password_hash(user.password)
         db_user = User(
             email=user.email,
             password=hashed_password,
-            first_name=user.first_name,
-            last_name=user.last_name
+            name=user.name,
+            username=user.username
         )
         self.db.add(db_user)
         self.db.commit()
@@ -31,7 +29,10 @@ class SQLUserRepository:
         if not user:
             raise ValueError("User not found")
 
-        for key, value in update_data.dict().items():
+        # Pydantic v2: use model_dump to get provided fields only
+        update_dict = update_data.model_dump(exclude_unset=True)
+        for key, value in update_dict.items():
+            # ensure keys match ORM attributes (name / username)
             setattr(user, key, value)
 
         self.db.commit()

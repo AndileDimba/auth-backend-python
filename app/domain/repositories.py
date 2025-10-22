@@ -1,10 +1,10 @@
 from abc import ABC, abstractmethod
-from app.domain.entities import UserInDB, UserCreate, UserUpdate
+from app.domain.entities import UserInDB, UserCreate, UserUpdate, UserInDBWithPassword
 
 
 class IUserRepository(ABC):
     @abstractmethod
-    def get_by_email(self, email: str) -> UserInDB | None:
+    def get_by_email(self, email: str) -> UserInDBWithPassword | None:
         pass
 
     @abstractmethod
