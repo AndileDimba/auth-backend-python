@@ -114,6 +114,7 @@ The API will be available at [http://localhost:8000](http://localhost:8000).
 
 ## Trade-offs
 - I used name for first_name and username for last_name because I was using a hosted database on a free site, and I cannot make a lot of changes to the table structure.
+- I used freedb panel since I already had a MySql db there for authentication with a table user. I do not use MySQL on personal level, I am a huge fan of SqlServer so I did not have the time to set it up from scratch.
 
 ## Troubleshooting
 
